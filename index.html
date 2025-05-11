@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Memory Game</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #021d1f;
+      min-height: 100vh;
+      margin: 0;
+      display: flex;
+      justify-content: center; /* Center horizontally */
+      align-items: center; /* Center vertically */
+      position: relative;
+      padding: 0; /* Remove padding to avoid offset */
+    }
+
+    select {
+      color: #00ffe1;
+    }
+
+    #celebration, #gameOver, #scoreScreen {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 999;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    #gameOver {
+      background: rgba(0,0,0,0.8);
+      color: #00f7ff;
+      font-size: 2rem;
+    }
+
+    #celebration h1, #scoreScreen h2 {
+      font-size: 2.5rem;
+      margin-top: 10px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin: 10px 0;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #45a049;
+      filter: drop-shadow(-17px 41px 52px #45a049);
+    }
+
+    #previousScores {
+      margin: 20px 0;
+      max-height: 200px;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .emoji {
+      font-size: 5rem;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    #gameContainer {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      max-width: 800px; /* Reduced max-width for better centering */
+    }
+
+    #grid {
+      display: grid;
+      gap: 10px;
+      justify-content: center;
+      margin: 20px 0; /* Adjusted margin for better centering */
+      width: 100%;
+    }
+
+    .card-container {
+      position: relative;
+      width: 100px;
+      height: 140px;
+    }
+
+    .card-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 8px; 
+  border: 2px solid #000;
+  box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
+}
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      background-color: white;
+      border-radius: 8px;
+      transition: transform 0.2s;
+      position: absolute;
+    }
+
+    img:hover {
+      transform: scale(1.05);
+      cursor: pointer;
+    }
+
+    #gameInfo {
+      margin-bottom: 20px;
+    }
+
+    #difficultySelector {
+      margin: 10px 0;
+    }
+
+    select {
+      padding: 5px;
+      font-size: 16px;
+      border-radius: 4px;
+      background-color: #021d1f;
+      border: 1px solid #00ffe1;
+    }
+
+    /* Desktop view (1024px and above) */
+    @media (min-width: 1024px) {
+      #grid {
+        grid-template-columns: repeat(5, 1fr);
+        grid-template-rows: auto;
+        gap: 10px;
+      }
+
+      .card-container {
+        width: 100px;
+        height: 140px;
+      }
+
+      button {
+        font-size: 18px;
+        padding: 12px 24px;
+      }
+
+      h1 {
+        font-size: 2.5rem;
+      }
+
+      h3 {
+        font-size: 1.5rem;
+      }
+
+      select {
+        font-size: 16px;
+      }
+
+      #celebration h1, #scoreScreen h2 {
+        font-size: 3rem;
+      }
+
+      .emoji {
+        font-size: 6rem;
+      }
+    }
+
+    /* Tablet view (601px to 1023px) */
+    @media (max-width: 1023px) and (min-width: 601px) {
+      #grid {
+        grid-template-columns: repeat(4, 1fr);
+        grid-template-rows: auto;
+        gap: 8px;
+      }
+
+      .card-container {
+        width: 80px;
+        height: 110px;
+      }
+
+      button {
+        font-size: 16px;
+        padding: 10px 20px;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      h3 {
+        font-size: 1.3rem;
+      }
+
+      select {
+        font-size: 14px;
+      }
+
+      #celebration h1, #scoreScreen h2 {
+        font-size: 2.2rem;
+      }
+
+      .emoji {
+        font-size: 4.5rem;
+      }
+    }
+
+    /* Mobile view (600px and below) */
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
+
+      #grid {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: auto;
+        gap: 6px;
+      }
+
+      .card-container {
+        width: 70px;
+        height: 100px;
+      }
+
+      button {
+        font-size: 14px;
+        padding: 8px 16px;
+      }
+
+      h1 {
+        font-size: 1.8rem;
+      }
+
+      h3 {
+        font-size: 1.2rem;
+      }
+
+      select {
+        font-size: 12px;
+        padding: 4px;
+      }
+
+      #celebration h1, #scoreScreen h2 {
+        font-size: 2rem;
+      }
+
+      .emoji {
+        font-size: 4rem;
+      }
+
+      #difficultySelector {
+        margin: 8px 0;
+      }
+
+      #gameInfo {
+        margin-bottom: 15px;
+      }
+    }
+
+    /* Very small screens (400px and below) */
+    @media (max-width: 400px) {
+      #grid {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: auto;
+        gap: 5px;
+      }
+
+      .card-container {
+        width: 60px;
+        height: 90px;
+      }
+
+      button {
+        font-size: 12px;
+        padding: 6px 12px;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      h3 {
+        font-size: 1rem;
+      }
+
+      select {
+        font-size: 11px;
+        padding: 3px;
+      }
+
+      #celebration h1, #scoreScreen h2 {
+        font-size: 1.8rem;
+      }
+
+      .emoji {
+        font-size: 3.5rem;
+      }
+
+      #difficultySelector {
+        margin: 5px 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="celebration">
+    <div class="emoji">🥳🎉</div>
+    <h1>Congratulations! Game Complete</h1>
+    <button id="viewScoreBtn">View the Score</button>
+  </div>
+
+  <div id="gameOver">
+    <h1><span style="font-size: 2.5rem;">⏰</span> Time's Up! Game Over</h1>
+    <button id="restartGameOverBtn">Restart Game</button>
+  </div>
+
+  <div id="scoreScreen">
+    <h2>Your Score: <span id="finalScore"></span></h2>
+    <h3>Previous Scores</h3>
+    <div id="previousScores"></div>
+    <button id="playAgainBtn">Play Again</button>
+  </div>
+
+  <div id="gameContainer">
+    <div id="gameInfo">
+      <h1>Memory Game</h1>
+      <div id="difficultySelector">
+        <label for="difficulty">Select Difficulty:</label>
+        <select id="difficulty">
+          <option value="easy">Easy (30s, 4x2 grid)</option>
+          <option value="medium" selected>Medium (40s, 5x2 grid)</option>
+          <option value="hard">Hard (60s, 5x4 grid)</option>
+        </select>
+      </div>
+      <h3>Score: <span id="score">0</span></h3>
+      <h3>Time Left: <span id="timer">--:-- s</span></h3>
+      <button id="restartBtn">Restart Game</button>
+    </div>
+
+    <div id="grid"></div>
+  </div>
+
+  <script>
+    const griddisplay = document.querySelector('#grid');
+    const resultdisplay = document.querySelector("#score");
+    const timerDisplay = document.querySelector("#timer");
+    const restartBtn = document.querySelector("#restartBtn");
+    const viewScoreBtn = document.querySelector("#viewScoreBtn");
+    const playAgainBtn = document.querySelector("#playAgainBtn");
+    const restartGameOverBtn = document.querySelector("#restartGameOverBtn");
+    const difficultySelect = document.querySelector("#difficulty");
+    const gameInfo = document.querySelector("#gameInfo");
+
+    const celebration = document.querySelector("#celebration");
+    const gameOver = document.querySelector("#gameOver");
+    const scoreScreen = document.querySelector("#scoreScreen");
+    const finalScoreDisplay = document.querySelector("#finalScore");
+    const previousScoresDisplay = document.querySelector("#previousScores");
+
+    let cards = [];
+    let card_chosen = [];
+    let card_chosen_id = [];
+    let cardsWon = [];
+    let previousScores = JSON.parse(localStorage.getItem('memoryGameScores')) || [];
+    let countdown;
+    let timeLeft = 0;
+
+    const images = [
+      { name: "cheetah", img: "image\\cheetah.jpg" },
+      { name: "elephant", img: "image\\elephant.jpg" },
+      { name: "giraffe", img: "image\\giraffe.jpg" },
+      { name: "lion", img: "image\\lion.jpg" },
+      { name: "penguin", img: "image\\penguin.jpg" },
+      { name: "polar_bear", img: "image\\polar beer.jpg" },
+      { name: "rhino", img: "image\\rhino.jpg" },
+      { name: "tiger", img: "image\\tiger.jpg" },
+      { name: "zebra", img: "image\\zebra.jpg" },
+      { name: "white tiger", img: "image\\white tiger.jpg" },
+      { name: "crow", img: "image\\crow.jpeg" },
+      { name: "eagle", img: "image\\eagle.jpeg" },
+      { name: "goose", img: "image\\goose.jpeg" },
+      { name: "owl", img: "image\\owl.jpeg" },
+      { name: "parrot", img: "image\\parrot.jpeg" },
+      { name: "peigon", img: "image\\peigon.jpeg" },
+      { name: "rainbird", img: "image\\rainbird.jpeg" },
+      { name: "sparrow", img: "image\\sparrow.jpeg" },
+      { name: "wood", img: "image\\wood.jpeg" },
+      { name: "woodpecker", img: "image\\woodpecker.jpeg" }
+    ];
+
+    let cardBackColor;
+    const transparentImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8/5+hHgAHggJ/PchI7wAAAABJRU5ErkJggg==';
+
+    function getRandomColor() {
+  const letters = '0123456789ABCDEF';
+  let color = '#';
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
+}
+
+function generateRandomGradient() {
+  const color1 = getRandomColor();
+  const color2 = getRandomColor();
+  const gradient = `linear-gradient(135deg, ${color1} 0%, ${color2} 40%, ${color1} 100%)`;
+  return { gradient, color1, color2 };
+}
+
+// Function to apply random gradient to body and return color for card backs
+function setBackgrounds() {
+  const { gradient, color1, color2 } = generateRandomGradient();
+  document.body.style.background = gradient;
+  cardBackColor = color1;
+  return cardBackColor;
+}
+
+    function generateBoard() {
+      griddisplay.innerHTML = "";
+      celebration.style.display = "none";
+      gameOver.style.display = "none";
+      scoreScreen.style.display = "none";
+      griddisplay.style.display = "grid";
+      gameInfo.style.display = "block";
+
+      card_chosen = [];
+      card_chosen_id = [];
+      cardsWon = [];
+      resultdisplay.textContent = 0;
+
+      clearInterval(countdown);
+      const difficulty = difficultySelect.value;
+      let pairCount, rows, columns;
+
+      if (difficulty === "easy") {
+        pairCount = 4;
+        rows = 2;
+        columns = 4;
+        timeLeft = 30;
+      } else if (difficulty === "medium") {
+        pairCount = 5;
+        rows = 2;
+        columns = 5;
+        timeLeft = 40;
+      } else {
+        pairCount = 10;
+        rows = 4;
+        columns = 5;
+        timeLeft = 60;
+      }
+
+      function getRandomElements(arr, count) {
+    const shuffled = arr.slice();
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled.slice(0, count);
+  }
+
+      const selectedCards = getRandomElements(images, pairCount);
+      cards = [...selectedCards, ...selectedCards].sort(() => 0.5 - Math.random());
+
+      griddisplay.style.gridTemplateRows = `repeat(${rows}, 1fr)`;
+
+      setBackgrounds();
+
+      cards.forEach((card, i) => {
+        const container = document.createElement('div');
+        container.classList.add('card-container');
+        const img = document.createElement('img');
+        img.setAttribute('src', transparentImage);
+        img.style.backgroundColor = cardBackColor;
+        img.setAttribute('data-id', i);
+        img.addEventListener('click', flipCard);
+        container.appendChild(img);
+        griddisplay.appendChild(container);
+      });
+
+      updateTimerDisplay();
+      startTimer();
+    }
+
+    window.onload = () => {
+  setBackgrounds();
+  generateBoard(); // Call generateBoard to set up the game
+};
+
+    function flipCard() {
+      const id = this.getAttribute('data-id');
+      if (card_chosen_id.includes(id)) return;
+
+      this.setAttribute('src', cards[id].img);
+      card_chosen.push(cards[id].name);
+      card_chosen_id.push(id);
+
+      if (card_chosen.length === 2) {
+        setTimeout(checkMatch, 500);
+      }
+    }
+
+    function checkMatch() {
+      const imgs = document.querySelectorAll('img');
+      const [id1, id2] = card_chosen_id;
+
+      if (card_chosen[0] === card_chosen[1] && id1 !== id2) {
+        imgs[id1].setAttribute('src', 'image\\done.png');
+        imgs[id2].setAttribute('src', 'image\\done.png');
+        imgs[id1].removeEventListener('click', flipCard);
+        imgs[id2].removeEventListener('click', flipCard);
+        cardsWon.push(card_chosen);
+      } else {
+        imgs[id1].style.backgroundColor = cardBackColor;
+    imgs[id2].style.backgroundColor = cardBackColor;
+    imgs[id1].setAttribute('src', transparentImage);
+    imgs[id2].setAttribute('src', transparentImage); 
+      }
+
+      card_chosen = [];
+      card_chosen_id = [];
+      resultdisplay.textContent = cardsWon.length;
+
+      if (cardsWon.length === cards.length / 2) {
+        clearInterval(countdown);
+        saveScore();
+        showCelebration();
+      }
+    }
+
+    function updateTimerDisplay() {
+      const minutes = String(Math.floor(timeLeft / 60)).padStart(2, '0');
+      const seconds = String(timeLeft % 60).padStart(2, '0');
+      timerDisplay.textContent = `${minutes}:${seconds} s`;
+    }
+
+    function startTimer() {
+      countdown = setInterval(() => {
+        timeLeft--;
+        updateTimerDisplay();
+        if (timeLeft <= 0) {
+          clearInterval(countdown);
+          disableAllCards();
+          showGameOver();
+        }
+      }, 1000);
+    }
+
+    function disableAllCards() {
+      document.querySelectorAll('img').forEach(img => img.removeEventListener('click', flipCard));
+    }
+
+    function saveScore() {
+      previousScores.push(cardsWon.length);
+      localStorage.setItem('memoryGameScores', JSON.stringify(previousScores));
+    }
+
+    function showCelebration() {
+      celebration.style.display = "flex";
+      griddisplay.style.display = "none";
+      gameInfo.style.display = "none";
+    }
+
+    function showGameOver() {
+      gameOver.style.display = "flex";
+      griddisplay.style.display = "none";
+      gameInfo.style.display = "none";
+    }
+
+    function showScoreScreen() {
+      celebration.style.display = "none";
+      scoreScreen.style.display = "flex";
+      finalScoreDisplay.textContent = cardsWon.length;
+      previousScoresDisplay.innerHTML = previousScores.map((s, i) => `<p>Game ${i+1}: ${s}</p>`).join('') || "<p>No previous scores</p>";
+    }
+
+    restartBtn.addEventListener('click', generateBoard);
+    restartGameOverBtn.addEventListener('click', generateBoard);
+    playAgainBtn.addEventListener('click', generateBoard);
+    viewScoreBtn.addEventListener('click', showScoreScreen);
+    difficultySelect.addEventListener('change', generateBoard);
+
+    generateBoard();
+  </script>
+</body>
+</html>
